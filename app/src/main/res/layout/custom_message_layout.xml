@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/message_profile_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="13dp"
+        android:src="@drawable/user_profile_image" />
+
+    <RelativeLayout
+        android:id="@+id/reciever_message_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/reciever_message_layout"
+        android:layout_toEndOf="@id/message_profile_image"
+        android:padding="6dp"
+        android:layout_marginEnd="24dp">
+
+        <TextView
+            android:id="@+id/reciever_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="reciever messages here"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:padding="4dp"/>
+
+        <TextView
+            android:id="@+id/reciever_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/reciever_message_text"
+            android:layout_marginEnd="8dp"
+            android:textSize="12sp"
+            android:text="10:40am"
+            android:layout_marginTop="-18dp"
+            android:layout_below="@id/reciever_message_text"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/message_sender_image_view"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/messageImageDeliverTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delivered"
+        android:layout_below="@id/message_sender_image_view"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/message_reciever_image_view"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
+        android:scaleType="centerCrop" />
+
+    <RelativeLayout
+        android:id="@+id/sender_message_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/sender_message_layout"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="10dp"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/sender_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@android:color/black"
+            android:text="sender messages"
+            android:textSize="14sp"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/sender_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="10:40am"
+            android:layout_toEndOf="@id/sender_message_text"
+            android:layout_below="@id/sender_message_text"
+            android:maxLines="1"
+            android:layout_marginTop="-18dp"
+            android:layout_marginEnd="10dp"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/messageDeliverTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delivered"
+        android:layout_below="@id/sender_message_rl"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"/>
+
+</RelativeLayout>

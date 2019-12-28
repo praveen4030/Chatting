@@ -1,0 +1,50 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/friendsTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Your Friends"
+            android:textSize="16sp"
+            android:textColor="@color/lightblack"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/friendsRv"
+            android:layout_below="@id/friendsTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp" />
+
+        <TextView
+            android:id="@+id/addFriendsTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_below="@id/friendsRv"
+            android:text="Add new Friends"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/lightblack"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="14dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/usersRv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addFriendsTv"/>
+
+    </RelativeLayout>
+</ScrollView>
