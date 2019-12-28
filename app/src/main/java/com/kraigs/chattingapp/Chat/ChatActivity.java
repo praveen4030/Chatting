@@ -66,6 +66,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userName,lastSeen,typingTv;
     private CircleImageView userImage;
 
+
     private Toolbar chatToolbar;
     private ImageButton sendMessageButton, sendFilesButton, imagesBt;
     private EditText messageInputText;
