@@ -173,7 +173,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:background="@drawable/shadedarkgreen"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -183,7 +182,7 @@
             android:layout_marginTop="72dp"
             android:padding="16dp"
             android:text="Verification Code"
-            android:textColor="@android:color/white"
+            android:textColor="@color/mainappcolour"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -195,7 +194,7 @@
             android:textSize="17sp"
             android:alpha="0.8"
             android:layout_marginTop="-10dp"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/mainappcolour" />
 
         <com.mukesh.OtpView
             android:id="@+id/otp_view"

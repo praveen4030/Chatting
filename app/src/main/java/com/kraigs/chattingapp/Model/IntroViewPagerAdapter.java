@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.kraigs.chattingapp.R;
 
 import java.util.List;
@@ -42,14 +43,14 @@ public class IntroViewPagerAdapter extends PagerAdapter {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layoutScreen = inflater.inflate(R.layout.zunit_intro , null);
 
-        ImageView imgSlide = layoutScreen.findViewById(R.id.intro_img);
+        LottieAnimationView animationView = layoutScreen.findViewById(R.id.loginAnim);
+        animationView.setAnimation(mListScreen.get(position).getAsset());
         TextView title = layoutScreen.findViewById(R.id.intro_title);
         TextView description = layoutScreen.findViewById(R.id.intro_description);
         LinearLayout introLl = layoutScreen.findViewById(R.id.introLl);
 
         title.setText(mListScreen.get(position).getTitle());
         description.setText(mListScreen.get(position).getDescription());
-        imgSlide.setImageResource(mListScreen.get(position).getScreenImg());
         introLl.setBackgroundResource(mListScreen.get(position).getBackground());
 
         container.addView(layoutScreen);
@@ -61,4 +62,5 @@ public class IntroViewPagerAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
+
 }

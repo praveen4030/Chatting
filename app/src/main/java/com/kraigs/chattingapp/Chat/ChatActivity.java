@@ -405,8 +405,8 @@ public class ChatActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                loadingBar.setTitle("Sending ic_file");
-                loadingBar.setMessage("Please wait,we are sending your ic_file.");
+                loadingBar.setTitle("Sending");
+                loadingBar.setMessage("Please wait,we are sending your image.");
                 loadingBar.setCanceledOnTouchOutside(false);
                 loadingBar.show();
 
@@ -440,7 +440,7 @@ public class ChatActivity extends AppCompatActivity {
                             myUrl = downloadUrl.toString();
 
                             HashMap<String, Object> messageTextBody = new HashMap<>();
-                            messageTextBody.put("message", myUrl);
+                            messageTextBody.put("message", "Image");
                             messageTextBody.put("name", uri.getLastPathSegment());
                             messageTextBody.put("type", checker);
                             messageTextBody.put("from", messageSenderId);
@@ -538,7 +538,7 @@ public class ChatActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     HashMap<String, Object> messageTextBody = new HashMap<>();
 
-                                    messageTextBody.put("message", uri.toString());
+                                    messageTextBody.put("message", "New File");
                                     messageTextBody.put("name", fileUri.getLastPathSegment());
                                     messageTextBody.put("type", checker);
                                     messageTextBody.put("from", messageSenderId);

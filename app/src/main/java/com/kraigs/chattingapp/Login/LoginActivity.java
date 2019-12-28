@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.kraigs.chattingapp.Chat.UserDetailsActivity;
 import com.kraigs.chattingapp.MainActivity;
 import com.kraigs.chattingapp.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -345,7 +346,11 @@ public class LoginActivity extends AppCompatActivity  implements View.OnClickLis
                             } else {
                                 String Uid = mAuth.getCurrentUser().getUid();
                                 String token = FirebaseInstanceId.getInstance().getToken();
-                                userRef.child(Uid).child("device_token").setValue(token).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                HashMap<String,String> map = new HashMap<>();
+                                map.put("device_token",token);
+                                map.put("key",Uid);
+
+                                userRef.child(Uid).child("device_token").setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
@@ -368,7 +373,7 @@ public class LoginActivity extends AppCompatActivity  implements View.OnClickLis
     }
 
     private void SendUserToDetailActivity() {
-        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent mainIntent = new Intent(LoginActivity.this, UserDetailsActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(mainIntent);
         finish();

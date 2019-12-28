@@ -8,13 +8,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/chatting"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/chatting"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".NotificationActivity"></activity>
-        <activity android:name=".ProfileActivity" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
@@ -27,7 +26,8 @@
         <activity android:name=".Login.LoginActivity" />
         <activity android:name=".Chat.ImageViewrActivity" />
         <activity android:name=".Chat.UserDetailsActivity" />
-        <activity android:name=".Chat.FriendsActivity" />
+        <activity android:name=".Chat.FriendsActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Chat.ChatActivity"
             android:theme="@style/AppTheme.NoActionBar" />

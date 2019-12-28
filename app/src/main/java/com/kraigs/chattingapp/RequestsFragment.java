@@ -154,15 +154,6 @@ public class RequestsFragment extends Fragment {
                     holder.itemView.setLayoutParams(params);
                 }
 
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), ProfileActivity.class);
-                        intent.putExtra("mentor_id", list_user_id);
-                        startActivity(intent);
-                    }
-                });
-
                 holder.acceptButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

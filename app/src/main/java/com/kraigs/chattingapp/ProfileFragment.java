@@ -1,7 +1,9 @@
 package com.kraigs.chattingapp;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,36 +11,53 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.kraigs.chattingapp.Chat.ChatActivity;
 import com.kraigs.chattingapp.Chat.FriendsActivity;
 import com.kraigs.chattingapp.Login.LoginActivity;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ProfileFragment extends Fragment {
 
     View v;
     Button connectBt;
-    DatabaseReference rootRef, friendsRef;
+    DatabaseReference rootRef, friendsRef,usersRef;
     String currentUserId;
     CircleImageView userProfilePic;
     TextView friendsCountTv;
@@ -55,6 +74,7 @@ public class ProfileFragment extends Fragment {
     RelativeLayout logOutRl;
     @BindView(R.id.userIdTv)
     TextView userIdTv;
+    ProgressDialog loadingBar;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -67,29 +87,33 @@ public class ProfileFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, v);
         initializeFields();
+        loadingBar = new ProgressDialog(getActivity());
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         rootRef = FirebaseDatabase.getInstance().getReference();
+        usersRef = rootRef.child("Users").child(currentUserId);
         friendsRef = rootRef.child("Friends");
 
         rootRef.child("Users").child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild("image")) {
-                    String image = dataSnapshot.child("image").getValue().toString();
-                    Picasso.get().load(image).into(userProfilePic);
-                }
+                if(dataSnapshot.exists()) {
 
-                String userID = dataSnapshot.child("userID").getValue().toString();
-                userIdTv.setText(userID);
+                    if (dataSnapshot.hasChild("image")) {
+                        String image = dataSnapshot.child("image").getValue().toString();
+                        Picasso.get().load(image).into(userProfilePic);
+                    }
 
-                String name = dataSnapshot.child("name").getValue().toString();
-                userNameTv.setText(name);
+                    if (dataSnapshot.hasChild("userID")) {
+                        String userID = dataSnapshot.child("userID").getValue().toString();
+                        userIdTv.setText(userID);
+                    }
 
-                if (dataSnapshot.hasChild("bio")) {
-                    String bio = dataSnapshot.child("bio").getValue().toString();
-                    bioTv.setText(bio);
+                    if (dataSnapshot.hasChild("name")) {
+                        String name = dataSnapshot.child("name").getValue().toString();
+                        userNameTv.setText(name);
+                    }
                 }
             }
 
@@ -99,30 +123,15 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-//        logOutRl.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                logOut();
-//            }
-//        });
-//
-//        friendsRl.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent2 = new Intent(getActivity(),FriendsActivity.class);
-//                startActivity(intent2);
-//            }
-//        });
-//
-//        addFriendsRl.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent2 = new Intent(getActivity(),FriendsActivity.class);
-//                startActivity(intent2);
-//            }
-//        });
-//
-
+        userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setAspectRatio(1,1)
+                        .start(getContext(),ProfileFragment.this);
+            }
+        });
 
         counts();
 
@@ -189,7 +198,6 @@ public class ProfileFragment extends Fragment {
 
     private void initializeFields() {
 
-        connectBt = v.findViewById(R.id.connectBt);
         friendsCountTv = v.findViewById(R.id.friendsCountTv);
         userNameTv = v.findViewById(R.id.userNameTv);
         userProfilePic = v.findViewById(R.id.user_profile_pic);
@@ -216,4 +224,49 @@ public class ProfileFragment extends Fragment {
                 break;
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+
+                loadingBar.setTitle("Profile Pic");
+                loadingBar.setMessage("Please wait,we are updating your profile.");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
+                Uri uri = result.getUri();
+
+                StorageReference filePath = FirebaseStorage.getInstance().getReference().child("Profile Images").child(currentUserId + ".jpg");
+                filePath.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()){
+                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    usersRef.child("image").setValue(uri.toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                loadingBar.dismiss();
+                                                Toast.makeText(getActivity(), "Profile pic updated successfully!", Toast.LENGTH_SHORT).show();
+                                            } else{
+                                                Toast.makeText(getActivity(), "Please try again", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+
 }

@@ -8,13 +8,15 @@
     android:id="@+id/introLl"
     android:background="@null">
 
-    <ImageView
-        android:id="@+id/intro_img"
-        android:layout_width="271dp"
-        android:layout_height="274dp"
-        android:layout_marginTop="45dp"
-        android:layout_gravity="center"
-        tools:srcCompat="@tools:sample/avatars" />
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loginAnim"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_fileName="chatting.json"
+        android:layout_marginTop="32dp" />
+
 
     <TextView
         android:id="@+id/intro_title"
@@ -23,7 +25,7 @@
         android:text="TextView"
         android:layout_margin="15dp"
         android:layout_gravity="center"
-        android:textColor="@color/white"
+        android:textColor="@color/mainappcolour"
         android:textSize="32dp"
         android:textStyle="bold"/>
 
@@ -35,6 +37,6 @@
         android:text="TextView"
         android:layout_gravity="center"
         android:textAlignment="center"
-        android:textColor="@color/white" />
+        android:textColor="@color/lightblack" />
 
 </LinearLayout>

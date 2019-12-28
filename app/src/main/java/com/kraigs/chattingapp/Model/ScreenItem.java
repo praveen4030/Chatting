@@ -1,22 +1,33 @@
 package com.kraigs.chattingapp.Model;
 
 public class ScreenItem {
-    String Title,Description,photo,blogID;
+    String Title,Description,photo,blogID,asset;
     int ScreenImg,background;
 
-    public ScreenItem(String title, String description, int background, int screenImg) {
+    public ScreenItem(String title, String description, String photo, String blogID, int screenImg, int background, String asset) {
         Title = title;
         Description = description;
-        this.background = background;
-        ScreenImg = screenImg;
-    }
-
-    public ScreenItem(String title, String photo, String blogID) {
-        Title = title;
         this.photo = photo;
         this.blogID = blogID;
+        ScreenImg = screenImg;
+        this.background = background;
+        this.asset = asset;
     }
 
+    public ScreenItem(String title, String description,String mAsset) {
+        Title = title;
+        Description = description;
+        asset = mAsset;
+
+    }
+
+    public String getAsset() {
+        return asset;
+    }
+
+    public void setAsset(String asset) {
+        this.asset = asset;
+    }
 
     public String getBlogID() {
         return blogID;

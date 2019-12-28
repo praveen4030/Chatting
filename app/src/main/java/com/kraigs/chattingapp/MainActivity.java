@@ -15,7 +15,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -79,6 +82,11 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Drawable dr = getResources().getDrawable(R.drawable.chatting);
+        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+        Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 40, 40, true));
+        getSupportActionBar().setIcon(d);
+
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         searchRv = findViewById(R.id.searchRv);
         linearLayoutManager = new LinearLayoutManager(this);
@@ -86,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         contentMainLl = findViewById(R.id.fragment_container);
         searchView = findViewById(R.id.search_view);
         userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
-        allUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         updateUserStatus();
         bottomNavigation = findViewById(R.id.bottomNavigationView);
@@ -169,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        verifyDetails();
+
+        allUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         allUsersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -217,127 +227,40 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-//                Query lastQuery = chatRef.child(userIDs).orderByKey().limitToLast(1);
-//                lastQuery.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-////                        String message = dataSnapshot.child("message").getValue().toString();
-////                        holder.userStatus.setText(message);
-//
-//                        for (DataSnapshot child: dataSnapshot.getChildren()) {
-//                            String message = child.child("message").getValue().toString();
-//                            String seen = child.child("seen").getValue().toString();
-//
-//                            if (seen.equals("false")){
-//                                holder.userStatus.setTypeface(null, Typeface.BOLD);
-//                                holder.userStatus.setTextColor(getResources().getColor(R.color.black));
-//                            }
-//
-//                            holder.userStatus.setText(message);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        //Handle possible errors.
-//                    }
-//                });
-
-//                friendsRef.child(userIDs).addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        if(dataSnapshot.exists()){
-//                            String status = dataSnapshot.child("Friends").getValue().toString();
-//                            if (status.equals("Saved")){
-//                                holder.clientStatus.setVisibility(View.GONE);
-//                            } else{
-//                                holder.clientStatus.setVisibility(View.VISIBLE);
-//                                holder.clientStatus.setText(status);
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
-
-//                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//                    @Override
-//                    public boolean onLongClick(View v) {
-//                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-//                        alertDialog.setTitle("Delete").setMessage("Do you want to delete this chat?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                notifyItemRemoved(position);
-//
-//                            }
-//                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) {
-//                            }
-//                        }).show();
-//
-//                        return true;
-//                    }
-//                });
-
-//                usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        if (dataSnapshot.exists()){
-//                            if (dataSnapshot.hasChild("image")){
-//                                profileImage[0] = dataSnapshot.child("image").getValue().toString();
-//                                Picasso.get().load(profileImage[0])
-//                                        .placeholder(R.drawable.user_profile_image)
-//                                        .into(holder.profileImage);
-//                            }
-//
-//                            if(dataSnapshot.hasChild("online")){
-//                                String onlineStatus = dataSnapshot.child("online").getValue().toString();
-//                                if (onlineStatus.equals("true")){
-//                                    holder.onlineStatus.setVisibility(View.VISIBLE);
-//                                } else{
-//                                    holder.onlineStatus.setVisibility(View.GONE);
-//                                }
-//                            }
-//
-//                            final String profileName = dataSnapshot.child("name").getValue().toString();
-//                            holder.userName.setText(profileName);
-
-//                            holder.itemView.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//
-//                                    Intent intent = new Intent(getActivity(), ChatActivity.class);
-//                                    intent.putExtra("visit_user_id",userIDs);
-//                                    startActivity(intent);
-//
-////                                    FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId).child("userState")
-////                                            .setValue("online").addOnCompleteListener(new OnCompleteListener<Void>() {
-////                                        @Override
-////                                        public void onComplete(@NonNull Task<Void> task) {
-////                                            if (task.isSuccessful()){
-////                                                Intent intent = new Intent(getContext(),ChatActivity.class);
-////                                                intent.putExtra("visit_user_id",userIDs);
-////                                                startActivity(intent);
-////                                            } else{
-////                                                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-////                                            }
-////                                        }
-////                                    });
-//                                }
-//                            });
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
-
     }
+
+    private void verifyDetails() {
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    if ( !dataSnapshot.hasChild("name")){
+                        Intent intent = new Intent(MainActivity.this,UserDetailsActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+
+                    if (!dataSnapshot.hasChild("key")){
+                        SetKey(dataSnapshot.getKey());
+                    }
+                } else{
+                    Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void SetKey(String key) {
+        userRef.child("key").setValue(key);
+    }
+
 
     private void updateUserStatus() {
 

@@ -3,7 +3,7 @@
 
 
     <item android:id="@+id/action_request"
-        android:title="Requests"
+        android:title="Friends"
         android:icon="@drawable/ic_request"/>
 
     <item android:id="@+id/action_home"

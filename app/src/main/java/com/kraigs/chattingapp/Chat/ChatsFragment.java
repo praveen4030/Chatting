@@ -1,6 +1,5 @@
 package com.kraigs.chattingapp.Chat;
 
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -37,6 +36,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class ChatsFragment extends Fragment {
 
     View v;
@@ -93,8 +93,7 @@ public class ChatsFragment extends Fragment {
         chatFb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), UserDetailsActivity.class);
-                intent.putExtra("user_id",currentUserId);
+                Intent intent = new Intent(getActivity(), FriendsActivity.class);
                 startActivity(intent);
             }
         });
@@ -130,7 +129,7 @@ public class ChatsFragment extends Fragment {
 
                             if (seen.equals("false")){
                                 holder.userStatus.setTypeface(null, Typeface.BOLD);
-                                holder.userStatus.setTextColor(getResources().getColor(R.color.black));
+                                holder.userStatus.setTextColor(getContext().getResources().getColor(R.color.black));
                             }
 
                             holder.userStatus.setText(message);

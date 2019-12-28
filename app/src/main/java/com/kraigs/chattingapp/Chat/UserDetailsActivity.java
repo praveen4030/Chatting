@@ -1,7 +1,9 @@
 package com.kraigs.chattingapp.Chat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
@@ -17,8 +19,15 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.kraigs.chattingapp.MainActivity;
 import com.kraigs.chattingapp.Model.IntroViewPagerAdapter;
 import com.kraigs.chattingapp.Model.ScreenItem;
@@ -36,10 +45,9 @@ public class UserDetailsActivity extends AppCompatActivity {
     IntroViewPagerAdapter introViewPagerAdapter ;
     TabLayout tabIndicator;
     Button btnNext;
-    int position = 0 ;
-    Button btnGetStarted;
-    Animation btnAnim ;
-    TextView tvSkip;
+    EditText nameEt;
+    DatabaseReference userRef;
+    String currentUserID;
 
     @SuppressLint("ResourceType")
     @Override
@@ -47,30 +55,30 @@ public class UserDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_details);
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        Window window = this.getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.white));
 
         //get permissions
         isReadStoragePermissionGranted();
         isWriteStoragePermissionGranted();
 
-        Window window = this.getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
+        currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
         getSupportActionBar().hide();
 
         btnNext = findViewById(R.id.btn_next);
-        btnGetStarted = findViewById(R.id.btn_get_started);
         tabIndicator = findViewById(R.id.tab_indicator);
-        btnAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.animator.button_animation);
-        tvSkip = findViewById(R.id.tv_skip);
+        nameEt = findViewById(R.id.nameEt);
 
         final List<ScreenItem> mList = new ArrayList<>();
-        mList.add(new ScreenItem("Find Gym","Find all gym near by your area and join directly from AsFit",R.drawable.shadedarkgreen, R.drawable.shadedarkgreen));
-        mList.add(new ScreenItem("Gym Buddy","Find your gym buddy to get company in the gym",R.drawable.shadedarkgreen, R.drawable.shadedarkgreen));
-        mList.add(new ScreenItem("Trainers","Get your trainer to train your body.",R.drawable.shadedarkgreen, R.drawable.shadedarkgreen));
-        mList.add(new ScreenItem("Learning","Read articles, watch videos and more to learn about fitness",R.drawable.shadedarkgreen, R.drawable.shadedarkgreen));
-        mList.add(new ScreenItem("Post","Post about your transformation,diet or anything related to fitness ",R.drawable.shadedarkgreen, R.drawable.shadedarkgreen));
+        mList.add(new ScreenItem("Connect","Connect with all your friends to start chatting","friends.json"));
+        mList.add(new ScreenItem("Chat","Start chatting with your friends","chat.json"));
+        mList.add(new ScreenItem("Online","Check your friends online status","online.json"));
+        mList.add(new ScreenItem("Notification","Receive instant notifications for new messages or friend requests ","no_notification.json"));
+        mList.add(new ScreenItem("Images","Share images or any file along with text messages.","sendimage.json"));
 
         // setup viewpager
         screenPager =findViewById(R.id.screen_viewpager);
@@ -86,69 +94,25 @@ public class UserDetailsActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                position = screenPager.getCurrentItem();
-                if (position < mList.size()) {
-
-                    position++;
-                    screenPager.setCurrentItem(position);
-
-                }
-
-                if (position == mList.size()-1) { // when we rech to the last screen
-                    // TODO : show the GETSTARTED Button and hide the indicator and the next button
-                    loaddLastScreen();
-                }
-
+                String name = nameEt.getText().toString();
+                userRef.child("name").setValue(name).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Intent intent = new Intent(UserDetailsActivity.this,MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        } else{
+                            Toast.makeText(UserDetailsActivity.this, "Please try again!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
-        tabIndicator.addOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-                if (tab.getPosition() == mList.size()-1) {
-                    loaddLastScreen();
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
-        // Get Started button click listener
-
-        btnGetStarted.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //open main activity
-
-                Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
-                mainActivity.putExtra("editType","beforeLogin");
-                startActivity(mainActivity);
-                // also we need to save a boolean value to storage so next time when the user run the app
-                // we could know that he is already checked the intro screen activity
-                // i'm going to use shared preferences to that process
-                finish();
-            }
-        });
 
         // skip button click listener
 
-        tvSkip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                screenPager.setCurrentItem(mList.size());
-            }
-        });
 
         final int[] current_position = {0};
         final Handler handler = new Handler();
@@ -172,16 +136,13 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
-    private void loaddLastScreen() {
-
-        btnNext.setVisibility(View.INVISIBLE);
-        btnGetStarted.setVisibility(View.VISIBLE);
-        tvSkip.setVisibility(View.INVISIBLE);
-        // TODO : ADD an animation the getstarted button
-        // setup animation
-        btnGetStarted.setAnimation(btnAnim);
-
-    }
+//    private void loaddLastScreen() {
+//
+//        btnNext.setVisibility(View.INVISIBLE);
+//        btnGetStarted.setVisibility(View.VISIBLE);
+//        btnGetStarted.setAnimation(btnAnim);
+//
+//    }
 
     public  boolean isReadStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -214,4 +175,5 @@ public class UserDetailsActivity extends AppCompatActivity {
             return true;
         }
     }
+
 }
