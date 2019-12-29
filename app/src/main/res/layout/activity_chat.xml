@@ -75,7 +75,7 @@
 
         <ImageButton
             android:id="@+id/send_message_btn"
-            android:layout_width="40dp"
+            android:layout_width="60dp"
             android:layout_height="40dp"
             android:scaleType="fitXY"
             android:layout_alignParentEnd="true"

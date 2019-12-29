@@ -2,6 +2,7 @@ package com.kraigs.chattingapp.Chat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -126,13 +127,20 @@ public class ChatsFragment extends Fragment {
                         for (DataSnapshot child: dataSnapshot.getChildren()) {
                             String message = child.child("message").getValue().toString();
                             String seen = child.child("seen").getValue().toString();
+                            String type = child.child("type").getValue().toString();
+                            if (type.equals("image")){
+                                holder.userStatus.setText("New Image");
+                            } else  if (type.equals("pdf")){
+                                holder.userStatus.setText("New File");
+                            } else{
+                                holder.userStatus.setText(message);
+                            }
 
                             if (seen.equals("false")){
                                 holder.userStatus.setTypeface(null, Typeface.BOLD);
-                                holder.userStatus.setTextColor(getContext().getResources().getColor(R.color.black));
+                                holder.userStatus.setTextColor(Color.BLACK);
                             }
 
-                            holder.userStatus.setText(message);
                         }
                     }
 
@@ -200,8 +208,11 @@ public class ChatsFragment extends Fragment {
                                 }
                             }
 
-                            final String profileName = dataSnapshot.child("name").getValue().toString();
-                            holder.userName.setText(profileName);
+                            if(dataSnapshot.hasChild("name")){
+                                final String profileName = dataSnapshot.child("name").getValue().toString();
+                                holder.userName.setText(profileName);
+                            }
+
 
                             holder.itemView.setOnClickListener(new View.OnClickListener() {
                                 @Override

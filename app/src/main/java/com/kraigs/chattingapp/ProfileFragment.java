@@ -44,6 +44,8 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -112,6 +114,7 @@ public class ProfileFragment extends Fragment {
 
                     if (dataSnapshot.hasChild("name")) {
                         String name = dataSnapshot.child("name").getValue().toString();
+//                        String time  = getTime(Long.parseLong("1577610313884"));
                         userNameTv.setText(name);
                     }
                 }

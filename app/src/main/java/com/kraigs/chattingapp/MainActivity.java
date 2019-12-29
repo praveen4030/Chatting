@@ -291,8 +291,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-            holder.onlineStatus.setVisibility(View.GONE);
-            holder.userName.setText(list.get(position).getName());
+            User user = list.get(position);
+            if (user.getOnline()!= null){
+                if (user.getOnline().equals("true")){
+                    holder.clientStatus.setVisibility(View.VISIBLE);
+                } else{
+                    holder.onlineStatus.setVisibility(View.GONE);
+                }
+            } else{
+                holder.onlineStatus.setVisibility(View.GONE);
+            }
+            if (user.getName()!=null){
+                holder.userName.setText(user.getName());
+            }
+
+            if (user.getImage()!=null){
+                Picasso.get().load(user.getImage()).placeholder(R.drawable.user_profile_image).into(holder.profileImage);
+            }
         }
 
         @Override

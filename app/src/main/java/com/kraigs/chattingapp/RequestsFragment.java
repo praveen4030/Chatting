@@ -76,6 +76,7 @@ public class RequestsFragment extends Fragment {
         FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions.Builder<User>()
                 .setQuery(query,User.class)
                 .build();
+
         FirebaseRecyclerAdapter<User,OnlineHolder> adapter = new FirebaseRecyclerAdapter<User, OnlineHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull OnlineHolder onlineHolder, int i, @NonNull User user) {
@@ -86,6 +87,7 @@ public class RequestsFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
                             String name = dataSnapshot.child("name").getValue().toString();
+
                             String online = dataSnapshot.child("online").getValue().toString();
                             if (dataSnapshot.hasChild("image")){
                                 String image = dataSnapshot.child("image").getValue().toString();

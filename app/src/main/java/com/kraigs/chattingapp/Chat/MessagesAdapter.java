@@ -32,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -116,24 +118,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             holder.imageDeliver.setVisibility(View.GONE);
         }
 
-        userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserId);
-
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    if (dataSnapshot.hasChild("image")) {
-                        String recieverImage = dataSnapshot.child("image").getValue().toString();
-                        Picasso.get().load(recieverImage).into(holder.recieverProfileImage);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        Picasso.get().load(messages.getImage()).placeholder(R.drawable.user_profile_image).into(holder.recieverProfileImage);
 
         holder.recieverMessageText.setVisibility(View.GONE);
         holder.recieverProfileImage.setVisibility(View.GONE);
@@ -142,7 +127,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         holder.messageRecieverPicture.setVisibility(View.GONE);
         holder.recieverTimeTv.setVisibility(View.GONE);
         holder.senderTimeTv.setVisibility(View.GONE);
-
         holder.senderRl.setVisibility(View.GONE);
         holder.recieverRl.setVisibility(View.GONE);
 
@@ -151,11 +135,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.senderMessageText.setVisibility(View.VISIBLE);
                 holder.senderRl.setVisibility(View.VISIBLE);
                 holder.senderTimeTv.setVisibility(View.VISIBLE);
-                holder.senderMessageText.setBackgroundResource(R.drawable.sender_message_layout);
-                holder.senderMessageText.setTextColor(Color.BLACK);
-//                holder.senderMessageText.setText(messages.getMessage() + "\n\n" + messages.getTime() + " - " + messages.getDate());
                 holder.senderMessageText.setText(messages.getMessage());
-                holder.senderTimeTv.setText(messages.getTime());
+                holder.senderTimeTv.setText(getTime(messages.getTime()));
 
             } else {
                 holder.recieverMessageText.setVisibility(View.VISIBLE);
@@ -165,9 +146,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
                 holder.recieverMessageText.setBackgroundResource(R.drawable.reciever_message_layout);
                 holder.senderMessageText.setTextColor(Color.BLACK);
-//                holder.recieverMessageText.setText(messages.getMessage() + "\n\n" + messages.getTime() + " - " + messages.getDate());
                 holder.recieverMessageText.setText(messages.getMessage());
-                holder.recieverTimeTv.setText(messages.getTime());
+                holder.recieverTimeTv.setText(getTime(messages.getTime()));
                 holder.senderTimeTv.setVisibility(View.GONE);
 
             }
@@ -190,7 +170,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.messageRecieverPicture.setVisibility(View.GONE);
 
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
-//                Picasso.get().load("gs://whatsapp-f3779.appspot.com/Image Files/ic_fileile.png").into(holder.messageSenderPicture);
                 holder.messageSenderPicture.setBackgroundResource(R.drawable.ic_file);
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -205,13 +184,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.recieverMessageText.setVisibility(View.GONE);
                 holder.senderMessageText.setVisibility(View.GONE);
                 holder.messageSenderPicture.setVisibility(View.GONE);
-
-
                 holder.messageRecieverPicture.setVisibility(View.VISIBLE);
                 holder.recieverProfileImage.setVisibility(View.VISIBLE);
-
-//                Picasso.get().load("gs://whatsapp-f3779.appspot.com/Image Files/ic_fileile.png").into(holder.messageRecieverPicture);
-
                 holder.messageRecieverPicture.setBackgroundResource(R.drawable.ic_file);
 
             }
@@ -405,10 +379,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Intent intent = new Intent(holder.itemView.getContext(), MainActivity.class);
-                    holder.itemView.getContext().startActivity(intent);
-
-                    Toast.makeText(holder.itemView.getContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                    userMessageList.remove(position);
+                    notifyItemRemoved(position);
                 } else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occured...", Toast.LENGTH_SHORT).show();
 
@@ -427,10 +399,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-
-                    Intent intent = new Intent(holder.itemView.getContext(), MainActivity.class);
-                    holder.itemView.getContext().startActivity(intent);
-                    Toast.makeText(holder.itemView.getContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                    userMessageList.remove(position);
+                    notifyItemRemoved(position);
                 } else {
                     Toast.makeText(holder.itemView.getContext(), "Error Occurred", Toast.LENGTH_SHORT).show();
 
@@ -457,9 +427,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Intent intent = new Intent(holder.itemView.getContext(), MainActivity.class);
-                                holder.itemView.getContext().startActivity(intent);
-                                Toast.makeText(holder.itemView.getContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                                userMessageList.remove(position);
+                                notifyItemRemoved(position);
                             }
                         }
                     });
@@ -496,6 +465,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         }
 
     }
+
+    private String getTime(long timestamp){
+        SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+        return  time.format(new Date(timestamp));
+    }
+
 }
 
 

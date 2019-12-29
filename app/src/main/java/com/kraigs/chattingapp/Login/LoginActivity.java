@@ -346,11 +346,11 @@ public class LoginActivity extends AppCompatActivity  implements View.OnClickLis
                             } else {
                                 String Uid = mAuth.getCurrentUser().getUid();
                                 String token = FirebaseInstanceId.getInstance().getToken();
-                                HashMap<String,String> map = new HashMap<>();
+                                HashMap<String,Object> map = new HashMap<>();
                                 map.put("device_token",token);
                                 map.put("key",Uid);
 
-                                userRef.child(Uid).child("device_token").setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                userRef.child(Uid).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){

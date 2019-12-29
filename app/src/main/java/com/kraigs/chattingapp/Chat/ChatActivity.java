@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.Query;
 import com.kraigs.chattingapp.GetTimeAgo;
 import com.kraigs.chattingapp.MainActivity;
 import com.kraigs.chattingapp.R;
@@ -66,12 +67,12 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userName,lastSeen,typingTv;
     private CircleImageView userImage;
 
-
     private Toolbar chatToolbar;
     private ImageButton sendMessageButton, sendFilesButton, imagesBt;
     private EditText messageInputText;
     private FirebaseAuth mAuth;
-    private DatabaseReference rootRef, imageRootRef, notiRef, friendsRef, channelRef, chatRef,userRef;
+    private DatabaseReference rootRef, imageRootRef, notiRef, friendsRef, channelRef,userRef,chatRef;
+    Query chatQuery;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -86,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
     RelativeLayout customchatToolbar;
     public static int FLAG_SEEN = 0;
     LinearLayout backLl;
+    String image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +103,7 @@ public class ChatActivity extends AppCompatActivity {
         friendsRef = FirebaseDatabase.getInstance().getReference().child("Friends");
         channelRef = rootRef.child("ChatChannel");
         chatRef = rootRef.child("Message").child(messageSenderId).child(messageRecieverID);
+        chatQuery = rootRef.child("Message").child(messageSenderId).child(messageRecieverID).orderByChild("time");
         userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(messageSenderId);
 
         InitializeFields();
@@ -111,7 +114,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild("image")) {
-                    String image = dataSnapshot.child("image").getValue().toString();
+                     image = dataSnapshot.child("image").getValue().toString();
                     Picasso.get().load(image).placeholder(R.drawable.user_profile_image).into(userImage);
                 }
 
@@ -141,7 +144,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        chatRef.addChildEventListener(new ChildEventListener() {
+        chatQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()) {
@@ -230,14 +233,16 @@ public class ChatActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(s)) {
                     channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("true");
                 } else {
-                    channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("false");                }
+                    channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("false");
+                }
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         channelRef.child(messageRecieverID).child(messageSenderId).addValueEventListener(new ValueEventListener() {
@@ -247,7 +252,7 @@ public class ChatActivity extends AppCompatActivity {
                     if(dataSnapshot.hasChild("typing")){
                         String typing = dataSnapshot.child("typing").getValue().toString();
                         if(typing.equals("true")){
-                            typingTv.setText("Typing");
+                            typingTv.setText("Typing...");
                             lastSeen.setVisibility(View.INVISIBLE);
                             typingTv.setVisibility(View.VISIBLE);
 
@@ -283,16 +288,18 @@ public class ChatActivity extends AppCompatActivity {
                     .child(messageSenderId).child(messageRecieverID).push();
             String messagePushId = userMessageKeyRef.getKey();
 
-            Map messageTextBody = new HashMap();
+            HashMap<String,Object> messageTextBody = new HashMap<>();
             messageTextBody.put("message", messageText);
             messageTextBody.put("type", "text");
             messageTextBody.put("from", messageSenderId);
             messageTextBody.put("to", messageRecieverID);
             messageTextBody.put("messageID", messagePushId);
-            messageTextBody.put("time", saveCurrentTime);
-            messageTextBody.put("date", saveCurrentDate);
+            messageTextBody.put("time", ServerValue.TIMESTAMP);
             messageTextBody.put("seen", "false");
             messageTextBody.put("key", userMessageKeyRef.getKey());
+            if (!TextUtils.isEmpty(image)){
+                messageTextBody.put("image", image);
+            }
 
             Map messageBodydetails = new HashMap();
             messageBodydetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
@@ -441,16 +448,19 @@ public class ChatActivity extends AppCompatActivity {
                             myUrl = downloadUrl.toString();
 
                             HashMap<String, Object> messageTextBody = new HashMap<>();
-                            messageTextBody.put("message", "Image");
+                            messageTextBody.put("message", myUrl);
                             messageTextBody.put("name", uri.getLastPathSegment());
                             messageTextBody.put("type", checker);
                             messageTextBody.put("from", messageSenderId);
                             messageTextBody.put("to", messageRecieverID);
                             messageTextBody.put("messageID", messagePushId);
-                            messageTextBody.put("time", saveCurrentTime);
-                            messageTextBody.put("date", saveCurrentDate);
+                            messageTextBody.put("time", ServerValue.TIMESTAMP);
                             messageTextBody.put("seen", "false");
                             messageTextBody.put("key", userMessageKeyRef.getKey());
+                            if (!TextUtils.isEmpty(image)){
+                                messageTextBody.put("image", image);
+                            }
+
 
                             HashMap<String, Object> messageBodyDetails = new HashMap<>();
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
@@ -539,16 +549,18 @@ public class ChatActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     HashMap<String, Object> messageTextBody = new HashMap<>();
 
-                                    messageTextBody.put("message", "New File");
+                                    messageTextBody.put("message", uri.toString());
                                     messageTextBody.put("name", fileUri.getLastPathSegment());
                                     messageTextBody.put("type", checker);
                                     messageTextBody.put("from", messageSenderId);
                                     messageTextBody.put("to", messageRecieverID);
                                     messageTextBody.put("messageID", messagePushId);
-                                    messageTextBody.put("time", saveCurrentTime);
-                                    messageTextBody.put("date", saveCurrentDate);
+                                    messageTextBody.put("time", ServerValue.TIMESTAMP);
                                     messageTextBody.put("seen", "false");
                                     messageTextBody.put("key", userMessageKeyRef.getKey());
+                                    if (!TextUtils.isEmpty(image)){
+                                        messageTextBody.put("image", image);
+                                    }
 
                                     HashMap<String, Object> messageBodydetails = new HashMap<>();
                                     messageBodydetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
@@ -624,29 +636,9 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        getMenuInflater().inflate(R.menu.main, menu);
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//
-//
-//
-//            default:
-//                // If we got here, the user's action was not recognized.
-//                // Invoke the superclass to handle it.
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
-
     @Override
     public void onBackPressed() {
+        channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("false");
         super.onBackPressed();
         finish();
         FLAG_SEEN = 0;
@@ -654,6 +646,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("false");
         super.onStop();
         FLAG_SEEN = 0;
     }
@@ -666,6 +659,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        channelRef.child(messageSenderId).child(messageRecieverID).child("typing").setValue("false");
         super.onPause();
         FLAG_SEEN = 0;
     }

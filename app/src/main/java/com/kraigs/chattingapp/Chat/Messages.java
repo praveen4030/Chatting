@@ -1,21 +1,38 @@
 package com.kraigs.chattingapp.Chat;
 
 public class Messages {
-    private String from,message,type,to,messageID,time,date,name,seen,key;
+    private String from,message,type,to,messageID,name,seen,key,image;
+    long time;
 
     public Messages(){}
 
-    public Messages(String from, String message, String type, String to, String messageID, String time, String date, String name, String seen, String key) {
+    public Messages(String from, String message, String type, String to, String messageID, String name, String seen, String key, String image, long time) {
         this.from = from;
         this.message = message;
         this.type = type;
         this.to = to;
         this.messageID = messageID;
-        this.time = time;
-        this.date = date;
         this.name = name;
         this.seen = seen;
         this.key = key;
+        this.image = image;
+        this.time = time;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public String getKey() {
@@ -74,21 +91,6 @@ public class Messages {
         this.messageID = messageID;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
 
     public String getName() {
         return name;
