@@ -106,8 +106,6 @@ public class ChatActivity extends AppCompatActivity {
         chatQuery = rootRef.child("Message").child(messageSenderId).child(messageRecieverID).orderByChild("time");
         userRef = FirebaseDatabase.getInstance().getReference().child("Users").child(messageSenderId);
 
-        InitializeFields();
-
         updateUserStatus();
 
         rootRef.child("Users").child(messageRecieverID).addValueEventListener(new ValueEventListener() {
@@ -143,6 +141,8 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        InitializeFields();
 
         chatQuery.addChildEventListener(new ChildEventListener() {
             @Override
@@ -297,9 +297,6 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("time", ServerValue.TIMESTAMP);
             messageTextBody.put("seen", "false");
             messageTextBody.put("key", userMessageKeyRef.getKey());
-            if (!TextUtils.isEmpty(image)){
-                messageTextBody.put("image", image);
-            }
 
             Map messageBodydetails = new HashMap();
             messageBodydetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
@@ -390,7 +387,7 @@ public class ChatActivity extends AppCompatActivity {
 
         customchatToolbar = (RelativeLayout) findViewById(R.id.customChatRl);
 
-        messagesAdapter = new MessagesAdapter(messagesList);
+        messagesAdapter = new MessagesAdapter(messagesList,messageRecieverID);
         userMessagesList = (RecyclerView) findViewById(R.id.private_message_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
@@ -457,10 +454,6 @@ public class ChatActivity extends AppCompatActivity {
                             messageTextBody.put("time", ServerValue.TIMESTAMP);
                             messageTextBody.put("seen", "false");
                             messageTextBody.put("key", userMessageKeyRef.getKey());
-                            if (!TextUtils.isEmpty(image)){
-                                messageTextBody.put("image", image);
-                            }
-
 
                             HashMap<String, Object> messageBodyDetails = new HashMap<>();
                             messageBodyDetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);
@@ -558,9 +551,6 @@ public class ChatActivity extends AppCompatActivity {
                                     messageTextBody.put("time", ServerValue.TIMESTAMP);
                                     messageTextBody.put("seen", "false");
                                     messageTextBody.put("key", userMessageKeyRef.getKey());
-                                    if (!TextUtils.isEmpty(image)){
-                                        messageTextBody.put("image", image);
-                                    }
 
                                     HashMap<String, Object> messageBodydetails = new HashMap<>();
                                     messageBodydetails.put(messageSenderRef + "/" + messagePushId, messageTextBody);

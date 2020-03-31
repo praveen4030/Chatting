@@ -1,12 +1,12 @@
 package com.kraigs.chattingapp.Chat;
 
 public class Messages {
-    private String from,message,type,to,messageID,name,seen,key,image;
+    private String from,message,type,to,messageID,name,seen,key,thumb;
     long time;
 
     public Messages(){}
 
-    public Messages(String from, String message, String type, String to, String messageID, String name, String seen, String key, String image, long time) {
+    public Messages(String from, String message, String type, String to, String messageID, String name, String seen, String key, String thumb, long time) {
         this.from = from;
         this.message = message;
         this.type = type;
@@ -15,16 +15,16 @@ public class Messages {
         this.name = name;
         this.seen = seen;
         this.key = key;
-        this.image = image;
+        this.thumb = thumb;
         this.time = time;
     }
 
-    public String getImage() {
-        return image;
+    public String getThumb() {
+        return thumb;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public long getTime() {

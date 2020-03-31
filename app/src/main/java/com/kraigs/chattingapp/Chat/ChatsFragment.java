@@ -99,6 +99,7 @@ public class ChatsFragment extends Fragment {
             }
         });
         return  v;
+
     }
 
     @Override
@@ -147,26 +148,6 @@ public class ChatsFragment extends Fragment {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         //Handle possible errors.
-                    }
-                });
-
-                friendsRef.child(userIDs).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
-                            String status = dataSnapshot.child("Friends").getValue().toString();
-                            if (status.equals("Saved")){
-                                holder.clientStatus.setVisibility(View.GONE);
-                            } else{
-                                holder.clientStatus.setVisibility(View.VISIBLE);
-                                holder.clientStatus.setText(status);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
                     }
                 });
 
@@ -222,19 +203,6 @@ public class ChatsFragment extends Fragment {
                                     intent.putExtra("visit_user_id",userIDs);
                                     startActivity(intent);
 
-//                                    FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId).child("userState")
-//                                            .setValue("online").addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                        @Override
-//                                        public void onComplete(@NonNull Task<Void> task) {
-//                                            if (task.isSuccessful()){
-//                                                Intent intent = new Intent(getContext(),ChatActivity.class);
-//                                                intent.putExtra("visit_user_id",userIDs);
-//                                                startActivity(intent);
-//                                            } else{
-//                                                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-//                                            }
-//                                        }
-//                                    });
                                 }
                             });
                         }
@@ -271,7 +239,7 @@ public class ChatsFragment extends Fragment {
     }
     public class ChatsViewHolder extends RecyclerView.ViewHolder
     {
-        TextView userName , userStatus,clientStatus;
+        TextView userName , userStatus;
         CircleImageView profileImage;
         ImageView onlineStatus;
 
@@ -280,7 +248,6 @@ public class ChatsFragment extends Fragment {
             userName = itemView.findViewById(R.id.user_profile_name);
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.users_profile_image);
-            clientStatus = itemView.findViewById(R.id.clientStatus);
             onlineStatus = itemView.findViewById(R.id.onlineStatus);
         }
     }

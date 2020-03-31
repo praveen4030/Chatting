@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -94,25 +95,27 @@ public class UserDetailsActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = nameEt.getText().toString();
-                userRef.child("name").setValue(name).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Intent intent = new Intent(UserDetailsActivity.this,MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        } else{
-                            Toast.makeText(UserDetailsActivity.this, "Please try again!", Toast.LENGTH_SHORT).show();
+                String name = nameEt.getText().toString().trim();
+                if(!TextUtils.isEmpty(name)) {
+                    userRef.child("name").setValue(name).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(UserDetailsActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(UserDetailsActivity.this, "Please try again!", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    Toast.makeText(UserDetailsActivity.this, "Please enter your name!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-
         // skip button click listener
-
 
         final int[] current_position = {0};
         final Handler handler = new Handler();

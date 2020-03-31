@@ -1,6 +1,7 @@
 package com.kraigs.chattingapp;
 
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -211,7 +212,6 @@ public class ProfileFragment extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.user_profile_pic:
-
                 break;
             case R.id.friendsRl:
             case R.id.addFriendsRl:
@@ -219,8 +219,24 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent2);
                 break;
             case R.id.shareRl:
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                sharingIntent.setType("text/*");
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, "Download this awesome Chatting app. https://play.google.com/store/apps/details?id=com.kraigs.chattingapp");
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "FreeCo App");
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 break;
             case R.id.rateRl:
+                Uri uri = Uri.parse("market://details?id=" + getActivity().getBaseContext().getPackageName());
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                try {
+                    startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + getActivity().getBaseContext().getPackageName())));
+                }
                 break;
             case R.id.logOutRl:
                 logOut();

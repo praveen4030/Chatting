@@ -13,14 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,6 +89,39 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
         Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 40, 40, true));
         getSupportActionBar().setIcon(d);
+
+        long versionCodeExist = BuildConfig.VERSION_CODE;
+        String versionName = BuildConfig.VERSION_NAME;
+
+        DatabaseReference updateRef = FirebaseDatabase.getInstance().getReference().child("appextras");
+        updateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long versionCode = (long) dataSnapshot.child("versionCode").getValue();
+                if (versionCode> versionCodeExist ){
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    alertDialogBuilder.setTitle("Update").setMessage("ChattingApp's new update is available. Download for endless fun.").setPositiveButton("Check", (dialog, which) -> {
+                        Uri uri = Uri.parse("market://details?id=" + getBaseContext().getPackageName());
+                        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                        try {
+                            startActivity(goToMarket);
+                        } catch (ActivityNotFoundException e) {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse("http://play.google.com/store/apps/details?id=" + getBaseContext().getPackageName())));
+                        }
+                    }).setNegativeButton("Cancel", (dialog, which) -> {
+                    }).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         searchRv = findViewById(R.id.searchRv);
@@ -199,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
@@ -294,14 +331,15 @@ public class MainActivity extends AppCompatActivity {
             User user = list.get(position);
             if (user.getOnline()!= null){
                 if (user.getOnline().equals("true")){
-                    holder.clientStatus.setVisibility(View.VISIBLE);
+                    holder.onlineStatus.setVisibility(View.VISIBLE);
                 } else{
                     holder.onlineStatus.setVisibility(View.GONE);
                 }
             } else{
                 holder.onlineStatus.setVisibility(View.GONE);
             }
-            if (user.getName()!=null){
+
+            if (user.getName()!=null && !TextUtils.isEmpty(user.getName())){
                 holder.userName.setText(user.getName());
             }
 
@@ -316,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public class SearchViewHolder extends RecyclerView.ViewHolder {
-            TextView userName, userStatus, clientStatus;
+            TextView userName, userStatus;
             CircleImageView profileImage;
             ImageView onlineStatus;
 
@@ -325,7 +363,6 @@ public class MainActivity extends AppCompatActivity {
                 userName = itemView.findViewById(R.id.user_profile_name);
                 userStatus = itemView.findViewById(R.id.user_status);
                 profileImage = itemView.findViewById(R.id.users_profile_image);
-                clientStatus = itemView.findViewById(R.id.clientStatus);
                 onlineStatus = itemView.findViewById(R.id.onlineStatus);
             }
         }

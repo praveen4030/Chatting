@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,7 +87,6 @@ public class FriendsActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 
     private void fetchUsers() {
@@ -217,7 +217,9 @@ public class FriendsActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull UsersListHolder holder, int position) {
             User model = list.get(position);
             Picasso.get().load(model.getImage()).placeholder(R.drawable.user_profile_image).fit().into(holder.userProfilePic);
-            holder.nameTv.setText(model.getName());
+            if(model.getName()!=null && !TextUtils.isEmpty(model.getName())){
+                holder.nameTv.setText(model.getName());
+            }
 
             String recieverUserID = model.getKey();
             final String[] currentState = {"new"};

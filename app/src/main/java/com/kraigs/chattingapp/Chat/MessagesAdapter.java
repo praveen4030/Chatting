@@ -44,12 +44,39 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     private List<Messages> userMessageList;
     private DatabaseReference userRef, chatRef;
+    private String recUser,recProfilePic;
     private FirebaseAuth mAuth;
     private static final String TAG = "MessageAdapter";
     String currentUserId;
 
     public MessagesAdapter(List<Messages> userMessageList) {
         this.userMessageList = userMessageList;
+    }
+
+    public MessagesAdapter(List<Messages> userMessageList,String recUser) {
+        this.userMessageList = userMessageList;
+        this.recUser = recUser;
+    }
+
+    private void profilePic(){
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(recUser);
+
+        usersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    if (dataSnapshot.hasChild("image")){
+                        recProfilePic = dataSnapshot.child("image").getValue().toString();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     public MessagesAdapter() {
@@ -60,6 +87,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.custom_message_layout, viewGroup, false);
         mAuth = FirebaseAuth.getInstance();
+        profilePic();
         return new MessageViewHolder(v);
     }
 
@@ -118,13 +146,19 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             holder.imageDeliver.setVisibility(View.GONE);
         }
 
-        Picasso.get().load(messages.getImage()).placeholder(R.drawable.user_profile_image).into(holder.recieverProfileImage);
+        Picasso.get().load(recProfilePic).placeholder(R.drawable.user_profile_image).into(holder.recieverProfileImage);
 
         holder.recieverMessageText.setVisibility(View.GONE);
         holder.recieverProfileImage.setVisibility(View.GONE);
         holder.senderMessageText.setVisibility(View.GONE);
         holder.messageSenderPicture.setVisibility(View.GONE);
+        holder.messageSenderPictureRl.setVisibility(View.GONE);
         holder.messageRecieverPicture.setVisibility(View.GONE);
+        holder.messageReceiverPicRl.setVisibility(View.GONE);
+        holder.messageSenderDocView.setVisibility(View.GONE);
+        holder.messageSenderDocRl.setVisibility(View.GONE);
+        holder.messageReceiverDocView.setVisibility(View.GONE);
+        holder.messageReceiverDocRl.setVisibility(View.GONE);
         holder.recieverTimeTv.setVisibility(View.GONE);
         holder.senderTimeTv.setVisibility(View.GONE);
         holder.senderRl.setVisibility(View.GONE);
@@ -154,10 +188,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         } else if (fromMessageType.equals("image")) {
             if (fromUserId.equals(messageSenderId)) {
                 holder.messageSenderPicture.setVisibility(View.VISIBLE);
+                holder.messageSenderPictureRl.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage()).into(holder.messageSenderPicture);
 
             } else {
                 holder.messageRecieverPicture.setVisibility(View.VISIBLE);
+                holder.messageReceiverPicRl.setVisibility(View.VISIBLE);
                 holder.recieverProfileImage.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage())
                         .into(holder.messageRecieverPicture);
@@ -168,9 +204,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.recieverProfileImage.setVisibility(View.GONE);
                 holder.senderMessageText.setVisibility(View.GONE);
                 holder.messageRecieverPicture.setVisibility(View.GONE);
+                holder.messageReceiverPicRl.setVisibility(View.GONE);
+                holder.messageReceiverDocView.setVisibility(View.GONE);
+                holder.messageReceiverDocRl.setVisibility(View.GONE);
+                holder.messageSenderPicture.setVisibility(View.GONE);
+                holder.messageSenderPictureRl.setVisibility(View.GONE);
+                holder.messageSenderDocView.setVisibility(View.VISIBLE);
+                holder.messageSenderDocRl.setVisibility(View.VISIBLE);
 
-                holder.messageSenderPicture.setVisibility(View.VISIBLE);
-                holder.messageSenderPicture.setBackgroundResource(R.drawable.ic_file);
+                if(messages.getThumb()!=null){
+                    Picasso.get().load(messages.getThumb()).placeholder(R.drawable.send_document).into(holder.messageSenderDocView);
+                }
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -184,9 +228,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
                 holder.recieverMessageText.setVisibility(View.GONE);
                 holder.senderMessageText.setVisibility(View.GONE);
                 holder.messageSenderPicture.setVisibility(View.GONE);
-                holder.messageRecieverPicture.setVisibility(View.VISIBLE);
+                holder.messageSenderPictureRl.setVisibility(View.GONE);
+                holder.messageRecieverPicture.setVisibility(View.GONE);
+                holder.messageReceiverPicRl.setVisibility(View.GONE);
+                holder.messageSenderDocView.setVisibility(View.GONE);
+                holder.messageSenderDocView.setVisibility(View.GONE);
+                holder.messageReceiverDocRl.setVisibility(View.VISIBLE);
+                holder.messageReceiverDocRl.setVisibility(View.VISIBLE);
                 holder.recieverProfileImage.setVisibility(View.VISIBLE);
-                holder.messageRecieverPicture.setBackgroundResource(R.drawable.ic_file);
+                if(messages.getThumb()!=null){
+                    Picasso.get().load(messages.getThumb()).placeholder(R.drawable.send_document).into(holder.messageReceiverDocView);
+                }
 
             }
         }
@@ -443,9 +495,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView senderMessageText, recieverMessageText;
         private CircleImageView recieverProfileImage;
-        private ImageView messageSenderPicture, messageRecieverPicture;
+        private ImageView messageSenderPicture, messageRecieverPicture,messageReceiverDocView,messageSenderDocView;
         public TextView deliverTv, imageDeliver, senderTimeTv, recieverTimeTv;
         RelativeLayout senderRl, recieverRl;
+        RelativeLayout messageSenderPictureRl,messageReceiverPicRl,messageSenderDocRl,messageReceiverDocRl;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -454,6 +507,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             recieverMessageText = (TextView) itemView.findViewById(R.id.reciever_message_text);
             recieverProfileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_image);
             messageSenderPicture = (ImageView) itemView.findViewById(R.id.message_sender_image_view);
+            messageReceiverDocView = itemView.findViewById(R.id.message_reciever_doc_view);
+            messageSenderDocView = itemView.findViewById(R.id.message_sender_doc_view);
             messageRecieverPicture = (ImageView) itemView.findViewById(R.id.message_reciever_image_view);
             deliverTv = (TextView) itemView.findViewById(R.id.messageDeliverTv);
             imageDeliver = itemView.findViewById(R.id.messageImageDeliverTv);
@@ -462,6 +517,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             senderRl = itemView.findViewById(R.id.sender_message_rl);
             recieverRl = itemView.findViewById(R.id.reciever_message_rl);
 
+            messageSenderPictureRl = itemView.findViewById(R.id.message_sender_image_rl);
+            messageSenderDocRl =  itemView.findViewById(R.id.message_sender_doc_rl);
+            messageReceiverPicRl =  itemView.findViewById(R.id.message_receiver_image_rl);
+            messageReceiverDocRl = itemView.findViewById(R.id.message_receiver_doc_rl);
         }
 
     }

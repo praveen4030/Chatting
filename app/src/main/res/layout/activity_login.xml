@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient">
 
     <RelativeLayout
         android:id="@+id/loginRl"
@@ -17,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ChattingApp"
-            android:textColor="@color/orange"
+            android:textColor="@color/white"
             android:id="@+id/raw2"
             android:textStyle="bold|italic"
             android:textSize="32sp"
@@ -31,7 +32,7 @@
             android:layout_below="@id/raw2"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            app:lottie_fileName="chatting.json"
+            app:lottie_fileName="login.json"
             android:layout_marginTop="32dp" />
 
         <TextView
@@ -42,7 +43,7 @@
             android:layout_centerHorizontal="true"
             android:layout_margin="12dp"
             android:textSize="20sp"
-            android:textColor="@color/orange"
+            android:textColor="@color/white"
             android:textStyle="bold|italic" />
 
         <RelativeLayout
@@ -58,7 +59,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:background="@drawable/sender_message_layout"
+                android:background="@drawable/curve"
+                android:backgroundTint="@color/white"
                 android:padding="7dp">
 
                 <RelativeLayout
@@ -85,7 +87,7 @@
                         android:layout_centerVertical="true"
                         android:hint="Mobile Number"
                         android:inputType="number"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
                         android:textColorHint="@color/grey"
                         android:textSize="18sp"
                         android:background="@null"/>
@@ -111,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="OR"
-                android:textColor="@color/orange"
+                android:textColor="@color/white"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/phoneLayout"
                 android:textSize="17sp" />
@@ -134,7 +136,7 @@
                     app:cardElevation="0dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/sender_message_layout"
-                    android:backgroundTint="@color/mainappcolor">
+                    android:backgroundTint="@color/white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -157,7 +159,7 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginEnd="7dp"
                             android:text="Sign In"
-                            android:textColor="@color/white"
+                            android:textColor="@color/mainappcolor"
                             android:textSize="19sp"
                             android:textAlignment="center"/>
                     </LinearLayout>
